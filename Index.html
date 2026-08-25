@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>InstaSave</title>
+  <!-- Font & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: #f8f9fc;
+      color: #1e293b;
+      transition: background 0.3s, color 0.3s;
+      padding: 16px 16px 80px;
+      min-height: 100vh;
+    }
+
+    body.dark {
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    .app-container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* Cards */
+    .card {
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 20px 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      transition: background 0.3s, box-shadow 0.3s;
+      border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    body.dark .card {
+      background: #1e293b;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      border-color: #334155;
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .app-name {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #f58529, #feda77, #dd2a7b, #8134af);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: 14px;
+      font-weight: 400;
+      color: #64748b;
+      margin-top: -4px;
+      margin-bottom: 18px;
+      letter-spacing: 0.2px;
+    }
+
+    body.dark .tagline {
+      color: #94a3b8;
+    }
+
+    .settings-icon {
+      font-size: 24px;
+      color: #64748b;
+      cursor: pointer;
+      transition: 0.2s;
+      padding: 8px;
+      border-radius: 40px;
+    }
+
+    .settings-icon:hover {
+      background: #f1f5f9;
+    }
+
+    body.dark .settings-icon {
+      color: #cbd5e1;
+    }
+
+    body.dark .settings-icon:hover {
+      background: #334155;
+    }
+
+    /* Input & button */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .url-input {
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 60px;
+      border: 1.5px solid #e2e8f0;
+      background: #f1f5f9;
+      font-size: 16px;
+      transition: 0.2s;
+      color: #0f172a;
+    }
+
+    body.dark .url-input {
+      background: #2d3a4f;
+      border-color: #475569;
+      color: #f1f5f9;
+    }
+
+    .url-input:focus {
+      outline: none;
+      border-color: #8134af;
+      box-shadow: 0 0 0 3px rgba(129, 52, 175, 0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #8134af, #dd2a7b);
+      border: none;
+      padding: 16px 20px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 17px;
+      color: white;
+      letter-spacing: 0.3px;
+      box-shadow: 0 6px 14px rgba(221, 42, 123, 0.25);
+      transition: 0.2s;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.97);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      border: none;
+      padding: 14px 18px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 15px;
+      color: #1e293b;
+      transition: 0.2s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid transparent;
+    }
+
+    body.dark .btn-secondary {
+      background: #2d3a4f;
+      color: #e2e8f0;
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.96);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #e2e8f0;
+      padding: 12px 18px;
+      border-radius: 60px;
+      font-weight: 600;
+      color: #1e293b;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    body.dark .btn-outline {
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+
+    /* Result card */
+    .preview-card {
+      display: none;
+      animation: fadeUp 0.35s ease;
+    }
+
+    .preview-card.active {
+      display: block;
+    }
+
+    .thumbnail {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #e2e8f0;
+      border-radius: 20px;
+      object-fit: cover;
+      margin-bottom: 12px;
+    }
+
+    body.dark .thumbnail {
+      background: #334155;
+    }
+
+    .media-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0 14px;
+    }
+
+    .media-title {
+      font-weight: 600;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 70%;
+    }
+
+    .media-type {
+      background: #eef2ff;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4338ca;
+    }
+
+    body.dark .media-type {
+      background: #312e81;
+      color: #c7d2fe;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .action-row .btn-primary {
+      flex: 2;
+      min-width: 140px;
+    }
+
+    .action-row .btn-secondary {
+      flex: 1;
+    }
+
+    /* History */
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eef2f6;
+    }
+
+    body.dark .history-item {
+      border-bottom-color: #334155;
+    }
+
+    .history-thumb {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      background: #d1d5db;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .history-info {
+      flex: 1;
+    }
+
+    .history-name {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .history-date {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    body.dark .history-date {
+      color: #94a3b8;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .history-actions button {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      color: #64748b;
+      padding: 6px;
+      cursor: pointer;
+      border-radius: 30px;
+      transition: 0.15s;
+    }
+
+    .history-actions button:hover {
+      background: #f1f5f9;
+    }
+
+    body.dark .history-actions button {
+      color: #cbd5e1;
+    }
+
+    body.dark .history-actions button:hover {
+      background: #334155;
+    }
+
+    .clear-history {
+      margin-top: 12px;
+      text-align: right;
+    }
+
+    /* Premium */
+    .premium-badge {
+      background: linear-gradient(135deg, #f5af19, #f12711);
+      color: white;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 60px;
+      display: inline-block;
+      font-size: 13px;
+    }
+
+    .premium-features {
+      list-style: none;
+      margin: 16px 0;
+    }
+
+    .premium-features li {
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    body.dark .premium-features li {
+      border-bottom-color: #334155;
+    }
+
+    /* Settings panel */
+    .settings-panel {
+      display: none;
+    }
+
+    .settings-panel.active {
+      display: block;
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+    }
+
+    .toggle {
+      width: 48px;
+      height: 28px;
+      background: #cbd5e1;
+      border-radius: 40px;
+      position: relative;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    body.dark .toggle {
+      background: #475569;
+    }
+
+    .toggle.active {
+      background: #8134af;
+    }
+
+    .toggle::after {
+      content: '';
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 40px;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      transition: 0.25s;
+    }
+
+    .toggle.active::after {
+      left: 23px;
+    }
+
+    /* loading */
+    .loader {
+      border: 4px solid #f1f5f9;
+      border-top: 4px solid #8134af;
+      border-radius: 60px;
+      width: 38px;
+      height: 38px;
+      animation: spin 0.9s linear infinite;
+      margin: 16px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .error-message {
+      color: #b91c1c;
+      background: #fee2e2;
+      padding: 14px 18px;
+      border-radius: 40px;
+      margin: 12px 0;
+      font-weight: 500;
+    }
+
+    body.dark .error-message {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+
+    .footer {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 13px;
+      padding: 24px 0 8px;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 28px;
+    }
+
+    body.dark .footer {
+      border-top-color: #334155;
+      color: #64748b;
+    }
+
+    .ad-placeholder {
+      background: #f1f5f9;
+      border-radius: 24px;
+      padding: 20px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 13px;
+      margin: 20px 0;
+      border: 1px dashed #cbd5e1;
+    }
+
+    body.dark .ad-placeholder {
+      background: #1e293b;
+      border-color: #475569;
+    }
+
+    /* utility */
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mt-2 { margin-top: 12px; }
+    .mb-2 { margin-bottom: 12px; }
+    .text-center { text-align: center; }
+    .gap-2 { gap: 8px; }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <!-- Header -->
+  <div class="card" style="padding-bottom: 12px;">
+    <div class="app-header">
+      <span class="app-name">InstaSave</span>
+      <i class="fas fa-cog settings-icon" id="settingsToggle"></i>
+    </div>
+    <div class="tagline">Save Instagram videos you have permission to download.</div>
+  </div>
+
+  <!-- Settings Panel -->
+  <div class="card settings-panel" id="settingsPanel">
+    <h3 style="margin-bottom: 8px;">Settings</h3>
+    <div class="toggle-row">
+      <span><i class="fas fa-moon"></i> Dark Mode</span>
+      <div class="toggle" id="darkToggle"></div>
+    </div>
+    <div class="toggle-row">
+      <span><i class="fas fa-download"></i> Download preferences</span>
+      <span style="color:#64748b; font-size:14px;">HD</span>
+    </div>
+    <button class="btn-secondary" style="width:100%; margin:8px 0;" id="clearHistoryBtn"><i class="fas fa-trash"></i> Clear History</button>
+    <div style="margin-top:12px; font-size:14px; color:#64748b;">
+      <p><i class="fas fa-shield-alt"></i> Privacy: We only process URLs you provide.</p>
+      <p><i class="fas fa-file-contract"></i> Terms & About InstaSave</p>
+    </div>
+  </div>
+
+  <!-- Main input -->
+  <div class="card">
+    <div class="input-group">
+      <input type="url" class="url-input" id="urlInput" placeholder="Paste Instagram video or Reel URL here…" />
+      <button class="btn-primary" id="processBtn"><i class="fas fa-play"></i> PROCESS VIDEO</button>
+    </div>
+    <div id="errorDisplay" class="error-message" style="display:none;"></div>
+    <div id="loadingIndicator" style="display:none;"><div class="loader"></div></div>
+  </div>
+
+  <!-- Result Card -->
+  <div class="card preview-card" id="resultCard">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-weight:600;"><i class="fas fa-video"></i> VIDEO PREVIEW</span>
+      <span class="media-type" id="mediaType">Reel</span>
+    </div>
+    <img class="thumbnail" id="thumbnailImg" src="#" alt="thumbnail" />
+    <div class="media-meta">
+      <span class="media-title" id="mediaTitle">Video title</span>
+    </div>
+    <div class="action-row">
+      <button class="btn-primary" id="downloadBtn"><i class="fas fa-download"></i> DOWNLOAD VIDEO</button>
+      <button class="btn-secondary" id="shareBtn"><i class="fas fa-share-alt"></i></button>
+      <button class="btn-secondary" id="newDownloadBtn"><i class="fas fa-plus"></i></button>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="card">
+    <div class="flex-between">
+      <h3><i class="fas fa-clock"></i> Download History</h3>
+      <span style="font-size:13px; color:#64748b;" id="historyCount">0 items</span>
+    </div>
+    <div id="historyList"></div>
+    <div class="clear-history">
+      <button class="btn-outline" id="clearHistoryBtn2" style="font-size:14px; padding:8px 20px;">Clear History</button>
+    </div>
+  </div>
+
+  <!-- Premium -->
+  <div class="card" style="background: linear-gradient(145deg, #f8f4ff, #f0ecfe); border: 1px solid #d9c9f0;">
+    <div class="flex-between">
+      <span class="premium-badge">PRO</span>
+      <span style="font-weight:700;">InstaSave PRO</span>
+    </div>
+    <ul class="premium-features">
+      <li><i class="fas fa-check-circle" style="color:#8134af;"></i> Ad-free experience</li>
+      <li><i class="fas fa-check-circle" style="color:#8134af;"></i> Faster processing</li>
+      <li><i class="fas fa-check-circle" style="color:#8134af;"></i> Download history & premium UI</li>
+    </ul>
+    <button class="btn-primary" style="width:100%;"><i class="fas fa-crown"></i> UPGRADE TO PRO</button>
+    <div style="margin-top:8px; font-size:12px; color:#64748b; text-align:center;">Payment integration via Google Play Billing</div>
+  </div>
+
+  <!-- Ad placeholder -->
+  <div class="ad-placeholder"><i class="fas fa-ad"></i> AdMob Banner (reserved)</div>
+
+  <!-- Bottom CTA -->
+  <div class="card text-center">
+    <h4 style="font-weight:600;">Enjoying InstaSave?</h4>
+    <p style="color:#64748b; margin:6px 0 12px;">Share the app with your friends.</p>
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn-secondary"><i class="fas fa-share-alt"></i> SHARE APP</button>
+      <button class="btn-secondary"><i class="fas fa-envelope"></i> CONTACT SUPPORT</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    INSTA SAVE © 2026 Samtec Innovation Centre<br>
+    <span style="font-size:12px;">Simple. Fast. Convenient.</span>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ---- state ----
+    let darkMode = localStorage.getItem('instasave-dark') === 'true';
+    let history = JSON.parse(localStorage.getItem('instasave-history')) || [];
+    let currentResult = null; // { title, thumbnail, downloadUrl, type }
+
+    // ---- DOM refs ----
+    const body = document.body;
+    const darkToggle = document.getElementById('darkToggle');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const settingsToggle = document.getElementById('settingsToggle');
+    const urlInput = document.getElementById('urlInput');
+    const processBtn = document.getElementById('processBtn');
+    const errorDisplay = document.getElementById('errorDisplay');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const resultCard = document.getElementById('resultCard');
+    const thumbnailImg = document.getElementById('thumbnailImg');
+    const mediaTitle = document.getElementById('mediaTitle');
+    const mediaType = document.getElementById('mediaType');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const newDownloadBtn = document.getElementById('newDownloadBtn');
+    const historyList = document.getElementById('historyList');
+    const historyCount = document.getElementById('historyCount');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const clearHistoryBtn2 = document.getElementById('clearHistoryBtn2');
+
+    // ---- dark mode ----
+    function applyDark(isDark) {
+      body.classList.toggle('dark', isDark);
+      darkToggle.classList.toggle('active', isDark);
+      localStorage.setItem('instasave-dark', String(isDark));
+    }
+    darkToggle.addEventListener('click', () => {
+      darkMode = !darkMode;
+      applyDark(darkMode);
+    });
+    applyDark(darkMode);
+
+    // ---- settings toggle ----
+    settingsToggle.addEventListener('click', () => {
+      settingsPanel.classList.toggle('active');
+    });
+
+    // ---- helpers ----
+    function showError(msg) {
+      errorDisplay.textContent = msg;
+      errorDisplay.style.display = 'block';
+      setTimeout(() => { errorDisplay.style.display = 'none'; }, 5000);
+    }
+
+    function clearError() {
+      errorDisplay.style.display = 'none';
+    }
+
+    function setLoading(loading) {
+      loadingIndicator.style.display = loading ? 'block' : 'none';
+      processBtn.disabled = loading;
+    }
+
+    function addHistoryItem(item) {
+      history.unshift(item);
+      if (history.length > 20) history.pop();
+      localStorage.setItem('instasave-history', JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      if (!historyList) return;
+      historyList.innerHTML = '';
+      history.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `
+          <img class="history-thumb" src="${item.thumbnail || '#'}" alt="thumb" />
+          <div class="history-info">
+            <div class="history-name">${item.title || 'Untitled'}</div>
+            <div class="history-date">${item.date || new Date().toLocaleDateString()}</div>
+          </div>
+          <div class="history-actions">
+            <button class="history-download" data-idx="${idx}"><i class="fas fa-download"></i></button>
+            <button class="history-delete" data-idx="${idx}"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        `;
+        historyList.appendChild(div);
+      });
+      // attach events
+      document.querySelectorAll('.history-download').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = e.currentTarget.dataset.idx;
+          const item = history[idx];
+          if (item && item.downloadUrl) {
+            window.open(item.downloadUrl, '_blank');
+          } else {
+            showError('Download URL not available');
+          }
+        });
+      });
+      document.querySelectorAll('.history-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = e.currentTarget.dataset.idx;
+          history.splice(idx, 1);
+          localStorage.setItem('instasave-history', JSON.stringify(history));
+          renderHistory();
+        });
+      });
+      historyCount.textContent = history.length + ' items';
+    }
+
+    // ---- clear history ----
+    function clearHistory() {
+      history = [];
+      localStorage.setItem('instasave-history', JSON.stringify(history));
+      renderHistory();
+    }
+    clearHistoryBtn.addEventListener('click', clearHistory);
+    clearHistoryBtn2.addEventListener('click', clearHistory);
+
+    // ---- simulate backend API call ----
+    function processUrl(url) {
+      return new Promise((resolve, reject) => {
+        // Simulate network delay
+        setTimeout(() => {
+          // Validate instagram URL pattern (basic)
+          const igPattern = /(?:instagram\.com\/reel\/|instagram\.com\/p\/|instagr\.am\/)/i;
+          if (!igPattern.test(url)) {
+            reject(new Error('Please enter a valid Instagram video or Reel URL.'));
+            return;
+          }
+          // Simulate 80% success, 20% failure (for demo)
+          const success = Math.random() < 0.8;
+          if (!success) {
+            reject(new Error('This content cannot be processed. It may be private or unavailable.'));
+            return;
+          }
+          // Mock response (conceptual)
+          resolve({
+            success: true,
+            title: 'Amazing Instagram Reel ✨',
+            thumbnail: 'https://picsum.photos/seed/ig/400/225',
+            downloadUrl: 'https://example.com/video.mp4', // placeholder
+            type: 'Reel'
+          });
+        }, 1200);
+      });
+    }
+
+    // ---- main process ----
+    async function handleProcess() {
+      clearError();
+      const url = urlInput.value.trim();
+      if (!url) {
+        showError('Please enter an Instagram URL.');
+        return;
+      }
+      // sanitize
+      const sanitized = url.replace(/[<>]/g, '');
+      setLoading(true);
+      resultCard.classList.remove('active');
+      try {
+        const data = await processUrl(sanitized);
+        // display result
+        currentResult = data;
+        thumbnailImg.src = data.thumbnail || 'https://picsum.photos/seed/default/400/225';
+        mediaTitle.textContent = data.title || 'Instagram Video';
+        mediaType.textContent = data.type || 'Video';
+        resultCard.classList.add('active');
+        // add to history
+        addHistoryItem({
+          title: data.title || 'Untitled',
+          thumbnail: data.thumbnail || 'https://picsum.photos/seed/default/60/60',
+          downloadUrl: data.downloadUrl,
+          date: new Date().toLocaleDateString()
+        });
+      } catch (err) {
+        showError(err.message || 'Something went wrong. Please try again.');
+        resultCard.classList.remove('active');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    processBtn.addEventListener('click', handleProcess);
+    urlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleProcess();
+    });
+
+    // ---- download / share / new ----
+    downloadBtn.addEventListener('click', () => {
+      if (currentResult && currentResult.downloadUrl) {
+        window.open(currentResult.downloadUrl, '_blank');
+      } else {
+        showError('Download URL not available.');
+      }
+    });
+
+    shareBtn.addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'InstaSave',
+          text: currentResult ? currentResult.title : 'Check out this video!',
+          url: window.location.href,
+        }).catch(() => {});
+      } else {
+        showError('Share not supported on this browser.');
+      }
+    });
+
+    newDownloadBtn.addEventListener('click', () => {
+      resultCard.classList.remove('active');
+      urlInput.value = '';
+      urlInput.focus();
+      currentResult = null;
+    });
+
+    // ---- init ----
+    renderHistory();
+
+    // ---- config section (for backend endpoint) ----
+    // You can replace the processUrl function with a fetch to your backend:
+    // const API_ENDPOINT = 'https://your-backend.com/api/process';
+    // async function processUrl(url) {
+    //   const res = await fetch(API_ENDPOINT, {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ url })
+    //   });
+    //   if (!res.ok) throw new Error('API error');
+    //   return res.json();
+    // }
+
+    console.log('InstaSave ready. Connect your backend endpoint in script.js');
+  })();
+</script>
+</body>
+</html>
